@@ -97,8 +97,8 @@ public class QuizApp extends Application
         startButton  = new Button("Start Quiz");
         startButton.setDisable(true);
 
-        final Task<List<String>> loadQuizTask;
-        loadQuizTask = new Task<>()
+        final Task<List<String>> loadQuiz;
+        loadQuiz = new Task<>()
         {
             @Override
             protected List<String> call() throws Exception
@@ -114,14 +114,14 @@ public class QuizApp extends Application
             }
         };
 
-        loadQuizTask.setOnSucceeded(event ->
+        loadQuiz.setOnSucceeded(event ->
         {
-            quizLines = loadQuizTask.getValue();
+            quizLines = loadQuiz.getValue();
             welcomeLabel.setText("Welcome to the Quiz App!");
             startButton.setDisable(false);
         });
 
-        new Thread(loadQuizTask).start();
+        new Thread(loadQuiz).start();
 
         currentScore          = BASE_SCORE;
         currentQuestionNumber = FIRST_QUESTION_NUMBER;
@@ -163,10 +163,9 @@ public class QuizApp extends Application
             final StringBuilder questionBuilder;
             questionBuilder = new StringBuilder();
 
-            generateQuestionIndices();
+            chooseQuestionIndices();
             getNextQuestion();
             
-            // Applied StringBuilder for dynamic label setup
             questionBuilder.append("Question ")
                            .append(currentQuestionNumber)
                            .append(" of ")
@@ -190,9 +189,10 @@ public class QuizApp extends Application
     }
 
     /*
-     * Populates the session list with 10 unique, random indices from the file.
+     * Chooses 10 unique, random indices from the file to
+     * avoid choosing the same question multiple times.
      */
-    private final void generateQuestionIndices()
+    private final void chooseQuestionIndices()
     {
         questionIndices.clear();
         while (questionIndices.size() < TOTAL_QUESTIONS_COUNT)
@@ -208,7 +208,7 @@ public class QuizApp extends Application
     }
 
     /*
-     * Selects a random question and splits the line into question and answer.
+     * Obtains the next chosen question and splits the line into question and answer.
      */
     private final void getNextQuestion()
     {
@@ -236,7 +236,8 @@ public class QuizApp extends Application
     }
 
     /*
-     * Retrieves user input and checks it against the current answer.
+     * Retrieves user input, evaluates it, and then determines
+     * the next step to take for this quiz attempt.
      */
     private final void submitUserAnswer()
     {
@@ -281,7 +282,7 @@ public class QuizApp extends Application
 
     /*
      * Checks if the quiz session has more questions remaining.
-     * @return true if below the total question count
+     * @return true if below the total question count, otherwise false
      */
     private final boolean existsRemainingQuestion()
     {
@@ -299,7 +300,6 @@ public class QuizApp extends Application
         currentQuestionNumber++;
         getNextQuestion();
 
-        // Applied StringBuilder for iteration updates
         nextQuestionBuilder.append("Question ")
                            .append(currentQuestionNumber)
                            .append(" of ")
@@ -347,7 +347,7 @@ public class QuizApp extends Application
     }
 
     /*
-     * Resets score and UI state to begin a new attempt.
+     * Resets score and UI state to begin a new quiz attempt.
      */
     private final void restartQuiz()
     {
@@ -375,10 +375,9 @@ public class QuizApp extends Application
         missedAnswers.clear();
         incorrectQuestions.clear();
         
-        generateQuestionIndices();
+        chooseQuestionIndices();
         getNextQuestion();
 
-        // Applied StringBuilder for reset text
         resetLabelBuilder.append("Question ")
                          .append(currentQuestionNumber)
                          .append(" of ")
