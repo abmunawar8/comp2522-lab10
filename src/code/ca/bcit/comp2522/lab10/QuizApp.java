@@ -40,6 +40,7 @@ public class QuizApp extends Application
     private static final int EXACT_QUESTION_PARTS   = 2;
     private static final int INDEX_FOR_QUESTION     = 0;
     private static final int INDEX_FOR_ANSWER       = 1;
+    private static final int INDEX_ADJUSTMENT       = 1;
 
     private final Random        randomGenerator;
     private final List<String>  missedQuestions;
@@ -47,21 +48,23 @@ public class QuizApp extends Application
     private final List<Integer> questionIndices;
     private final List<Integer> incorrectQuestions;
 
+    private final VBox      quizLayout;
+    private final Scene     quizScene;
+    private final Label     questionLabel;
+    private final Button    submitButton;
+    private final Button    restartButton;
+    private final TextField answerTextField;
+    private final Label     scoreLabel;
+    private final TextArea  summaryTextArea;
+
     private String       currentQuestion;
     private String       currentAnswer;
-    private Scene        quizScene;
-    private Label        questionLabel;
-    private Button       submitButton;
-    private Button       restartButton;
-    private TextField    answerTextField;
-    private Label        scoreLabel;
-    private TextArea     summaryTextArea;
     private int          currentScore;
     private int          currentQuestionNumber;
     private List<String> quizLines;
 
     /**
-     * Constructs a new QuizApp and initializes internal collections.
+     * Constructs a new QuizApp and initializes internal collections and main elements.
      */
     public QuizApp()
     {
@@ -70,6 +73,15 @@ public class QuizApp extends Application
         missedAnswers      = new ArrayList<>();
         questionIndices    = new ArrayList<>();
         incorrectQuestions = new ArrayList<>();
+
+        quizLayout      = new VBox(VBOX_SPACING_PX);
+        quizScene       = new Scene(quizLayout, SCENE_WIDTH_PX, SCENE_HEIGHT_PX);
+        questionLabel   = new Label("Question 1 of " + TOTAL_QUESTIONS_COUNT + " : ");
+        submitButton    = new Button("Submit");
+        restartButton   = new Button("Restart");
+        answerTextField = new TextField();
+        scoreLabel      = new Label("Score: " + currentScore);
+        summaryTextArea = new TextArea();
     }
 
     /**
@@ -81,7 +93,6 @@ public class QuizApp extends Application
     {
         final URL       cssFileUrl;
         final VBox      startLayout;
-        final VBox      quizLayout;
         final Label     welcomeLabel;
         final Scene     startScene;
         final Button    startButton;
@@ -134,16 +145,8 @@ public class QuizApp extends Application
         startLayout.getStyleClass().add("root-box");
         startScene.getStylesheets().add(cssFileUrl.toExternalForm());
 
-        scoreLabel      = new Label("Score: " + currentScore);
-        questionLabel   = new Label("Question 1 of " + TOTAL_QUESTIONS_COUNT + " : ");
-        answerTextField = new TextField();
-        summaryTextArea = new TextArea();
-        submitButton    = new Button("Submit");
-        restartButton   = new Button("Restart");
         buttonStackPane = new StackPane();
-        quizLayout      = new VBox(VBOX_SPACING_PX);
-        quizScene       = new Scene(quizLayout, SCENE_WIDTH_PX, SCENE_HEIGHT_PX);
-        
+
         questionLabel.getStyleClass().add("question-label");
         summaryTextArea.setEditable(false);
         summaryTextArea.setWrapText(true);
@@ -222,7 +225,7 @@ public class QuizApp extends Application
             throw new RuntimeException("Quiz file is empty or not loaded");
         }
 
-        index = questionIndices.get(currentQuestionNumber - 1);
+        index = questionIndices.get(currentQuestionNumber - INDEX_ADJUSTMENT);
         line  = quizLines.get(index);
         questionParts = line.split("\\|");
         
